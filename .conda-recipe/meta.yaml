@@ -27,8 +27,6 @@ requirements:
     - base-node-rpc
     - m2w64-toolchain
 
-#     Split into `noarch` C++ header package and platform-specific Python
-#     package.
   run:
       - python {{ python }}
       - protobuf 3.20.3
