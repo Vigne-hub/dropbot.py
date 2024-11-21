@@ -1,134 +1,60 @@
-{% if GIT_DESCRIBE_NUMBER > '0' %}
-{% set GIT_VERSION = GIT_DESCRIBE_TAG[1:] + '.post' + GIT_DESCRIBE_NUMBER %}
-{% else %}
-{% set GIT_VERSION = GIT_DESCRIBE_TAG[1:] %}
-{% endif %}
 {% set PKG_NAME = 'dropbot' %}
 {% set LIB_NAME = 'Dropbot' %}
 {% set MODULE_NAME = PKG_NAME.replace('-', '_') %}
 {% set PLATFORMIO_ENVS = 'teensy31'.split(' ') %}
+
+source:
+  git_url: ../
+
 package:
   name: {{ PKG_NAME }}
-  version: {{ GIT_VERSION }}
+  version: 2.0
 
 build:
-  # If this is a new build for the same version, increment the build number.
-  # If you do not include this key, it defaults to 0.
-  number: 0
   noarch: python
-  entry_points:
-    - dropbot-self-test = dropbot.bin.self_test:main
-    - dropbot-upload = dropbot.bin.upload:upload
   script:
-    # Copy Arduino library to Conda include directory and generate Arduino `library.properties` file
-    - python file_handler.py {{ SRC_DIR }} {{ PREFIX }} {{ PKG_NAME }} {{ MODULE_NAME }} {{ LIB_NAME }}
-    # Install source directory as Python package.
-    - python setup.py install --single-version-externally-managed --record record.txt
+    # Ensure Python script is executed in a clean environment
+    - python generate_python_files.py
+    # Install the Python package using pip for better compatibility
+    - pip install . --no-deps --ignore-installed --no-cache-dir
 
 requirements:
   build:
-        - python {{ python }}
-        - pint
-        - numpy
-        - pandas
-        - pandoc
-        - pypandoc
-        - jinja2
-        - pytables
-        - protobuf 3.20.*
-        - tabulate
-        - aiosignal
-        - matplotlib
-        - platformio
-        - beautifulsoup4
-        - nadamq
-        - debounce
-        - base-node
-        - svg-model
-        - json-tricks
-        - serial-device
-        - arduino-rpc
-        - base-node-rpc
-        - teensy-minimal-rpc
-        - dropbot-headers
-        - path-helpers
-        - conda-helpers
-        - nanopb-helpers
-        - asyncio-helpers
-        - logging-helpers
-        - platformio-helpers
-        - hv-switching-board
+    - python {{ python }}
+    - protobuf 3.20.3
+    - protoc 3.1.0
+    - six
+    - base-node-rpc
+    - m2w64-toolchain
 
 #     Split into `noarch` C++ header package and platform-specific Python
 #     package.
-outputs:
-  - name: {{ PKG_NAME }}-dev
-    noarch: generic
-    files:
-      - share
-    requirements:
-      run:
-        - dropbot-headers
-        - base-node-dev
-        - arduino-rpc-dev
-        - base-node-rpc-dev
-        - teensy-minimal-rpc-dev
-  - name: {{ PKG_NAME }}
-    files:
-      - {{ SP_DIR }}/{{ MODULE_NAME }}
-    requirements:
-      run:
-        - python >=3.6
-        - {{ pin_subpackage(PKG_NAME + '-dev', max_pin='x.x') }}
-        - pint
-        - numpy
-        - pandas
-        - pandoc
-        - pypandoc
-        - jinja2
-        - pytables
-        - protobuf 3.20.* 
-        - tabulate
-        - aiosignal
-        - matplotlib
-        - platformio
-        - beautifulsoup4
-        - nadamq
-        - debounce
-        - base-node
-        - svg-model
-        - json-tricks
-        - serial-device
-        - arduino-rpc
-        - base-node-rpc
-        - teensy-minimal-rpc
-        - path-helpers
-        - conda-helpers
-        - nanopb-helpers
-        - asyncio-helpers
-        - logging-helpers
-        - platformio-helpers
-        - hv-switching-board
+  run:
+      - python {{ python }}
+      - protobuf 3.20.3
+      - protoc 3.1.0
+      - six
+      - base-node-rpc
+      - teensy-minimal-rpc
+      - base-node
+      - bs4
+      - pandoc
+      - pypandoc
+      - tqdm
+      - matplotlib
+      - svg-model
+      - m2w64-toolchain  # this should not be here, but in nadamq. That update needs to be done at some point. Workaround it by having this here. If in an environemnt with dropbot.py already installed. We cna just install with --no-deps option.
 
-    test:
-      imports:
-        # .. versionchanged:: 1.37.2
-        - {{ MODULE_NAME }}
-        - {{ MODULE_NAME + '._version' }}
-        - {{ MODULE_NAME + '.bin' }}
-        - {{ MODULE_NAME + '.config' }}
-        - {{ MODULE_NAME + '.hardware_test' }}
-        - {{ MODULE_NAME + '.metadata' }}
-        - {{ MODULE_NAME + '.proxy' }}
-        - {{ MODULE_NAME + '.state' }}
+test:
+  imports:
+    # .. versionchanged:: 1.37.2
+    - {{ MODULE_NAME }}
+    - {{ MODULE_NAME + '.config' }}
+    - {{ MODULE_NAME + '.proxy' }}
+    - {{ MODULE_NAME + '.state' }}
+    - {{ MODULE_NAME + '.metadata' }}
 
 about:
   home: https://github.com/sci-bots/{{ PKG_NAME }}
   license: MIT
   summary: Dropbot API
-
-# source will be downloaded prior to filling in jinja templates
-# Example assumes that this folder has setup.py in it
-source:
-  git_url: ../
-#  path: ..
