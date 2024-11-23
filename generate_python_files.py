@@ -4,7 +4,7 @@ import versioneer
 import os
 
 from typing import Dict
-from file_handler import get_properties
+from file_handler import get_properties, compile_protobufs
 
 from base_node_rpc.helpers import generate_protobuf_python_code, generate_python_code
 
@@ -22,6 +22,7 @@ def generate_all_python_code(lib_options: Dict) -> None:
 
     generate_protobuf_python_code(lib_options)
     generate_python_code(lib_options)
+    compile_protobufs(**lib_options)
 
     print(f"{'#' * len(top)}")
 
