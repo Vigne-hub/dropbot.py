@@ -41,3 +41,6 @@ dropbot/notebooks/.results
 # rattler-build (pixi build) output
 .pixi-build/
 recipe/output/
+# pixi environments
+.pixi/*
+!.pixi/config.toml

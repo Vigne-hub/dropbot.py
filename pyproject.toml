@@ -36,7 +36,7 @@ include = ["dropbot*"]
 # code and compiles the Teensy firmware. Binary dependencies are declared in
 # the recipe, not here.
 [tool.pixi.workspace]
-channels = ["conda-forge", "alexsk", "vignesh229"]
+channels = ["https://prefix.dev/vigne-hub/scibots", "conda-forge", "alexsk", "vignesh229"]
 platforms = ["win-64", "linux-64"]
 preview = ["pixi-build"]
 
@@ -48,6 +48,11 @@ version = "1.74.7"
 name = "pixi-build-rattler-build"
 version = "0.*"
 channels = ["https://prefix.dev/conda-forge"]
+
+[tool.pixi.dependencies]
+dropbot = ">=1.74.7,<2"
+ntfsutils = ">=0.1.5,<0.2"
+ipython = ">=9.17.1,<10"
 
 # --- commitizen -----------------------------------------------------------
 # `cz bump` derives the next version from Conventional Commits, stamps every
